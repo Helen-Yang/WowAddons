@@ -1,6 +1,8 @@
-## Interface: 70300
+## Interface: 70
+
+300
 ## Title: PvPInfo
 ## Version: 1.0.0
-## Description: Identifies the healers on both teams in a battleground with class colors. New features to be added. 
+## Description: Identifies the healers on both teams in a battleground with class colors. When in a battleground, click the Display Healers button. 
 
 PvPInfo.lua

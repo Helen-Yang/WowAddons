@@ -21,29 +21,33 @@ healers = {}
 allianceHealers= {}
 hordeHealers = {}
 playersInBG = 0
+displayHealsButton = nil
 
 enterBattlegroundFrame = CreateFrame("Frame")
-enterBattlegroundFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+enterBattlegroundFrame:RegisterEvent("PLAYER_ENTERING_BATTLEGROUND")
 
 enterBattlegroundFrame:SetScript("OnEvent", function(self, event, ...)
 		-- print("entered world")
-		if UnitInBattleground("player") then
-			-- print("unit inbg")
-			inBattleground()
+		if not displayHealsButton then 
+			-- print("making a button for the first time")
+			displayHealsButton = makeButton()
 		end
-		enterBattlegroundFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		enterBattlegroundFrame:UnregisterEvent("PLAYER_ENTERING_BATTLEGROUND")
 	end)
 
 function makeButton()
-	button = CreateFrame("Button", button, UIParent, "UIPanelButtonTemplate")
-	button:SetSize(110, 30)
-	button:SetText("Display Healers")
-	button:SetPoint("CENTER", 400, 300)
-	--when button is clicked, display healers 
-	button:SetScript("OnClick", function(self, button, down)
-		displayHealers()
+	displayHealsButton = CreateFrame("Button", displayHealsButton, UIParent, "UIPanelButtonTemplate")
+	displayHealsButton:SetSize(110, 30)
+	displayHealsButton:SetText("Display Healers")
+	displayHealsButton:SetPoint("CENTER", 400, 300)
+	--when displayHealsButton is clicked, display healers 
+	displayHealsButton:SetScript("OnClick", function(self, displayHealsButton, down)
+		--TODO: refresh stats
+		if UnitInBattleground("player") then
+			inBattleground()
+		end
+		
 	end)
-	return button
 end
 
 function initialize()
@@ -52,7 +56,7 @@ function initialize()
 	players = {}
 	--number
 	playersInBG = 0	
-	makeButton()
+	-- makeButton()
 end
 
 function getClassColor(className)
@@ -94,11 +98,7 @@ function tableLength(t)
 end
 
 function getSpecs()
-	-- ChatFrame1:AddMessage("in getspecs")
-	-- ChatFrame1:AddMessage("numscores"..GetNumBattlefieldScores())
-	-- ChatFrame1:AddMessage(GetBattlefieldScore(1))
 	playersInBG = GetNumBattlefieldScores()
-	-- print("playersinbg"..playersInBG)
 	if playersInBG == 0 then
 		inBattleground()
 	end
@@ -111,19 +111,16 @@ function getSpecs()
 	identifyHeals()
 end
 
---TODO: check if in bg, run if in bg
 function inBattleground()
 	initialize()
 	-- ChatFrame1:AddMessage("entered inbg")
 	--get bg data
-	-- print("inbg")
 	RequestBattlefieldScoreData()
 	updateBattlefieldFrame = CreateFrame("Frame")
 	updateBattlefieldFrame:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
-	updateBattlefieldFrame:SetScript("OnEvent", function(self,event,...) 
-		-- ChatFrame1:AddMessage("updated bscores")
-		-- print("score has been updated")
+	updateBattlefieldFrame:SetScript("OnEvent", function(self, event,...) 
 		getSpecs()
+		displayHealers()
 		updateBattlefieldFrame:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
 	end)
 	
@@ -135,7 +132,6 @@ function identifyHeals()
 	for i, v in ipairs(players) do
  		for j, t in ipairs(HEALING_SPECS) do
  			--check specialization name
- 			-- print(v[3])
     		if v[4] == t then
       			table.insert(healers, v)
       		end
@@ -144,7 +140,6 @@ function identifyHeals()
 end
 
 function sortByFaction()
-	--TODO: get unit faction to determine enemy/ally
 	allianceHealers = {}
 	hordeHealers = {}
 	for i, v in ipairs(healers) do
@@ -159,19 +154,16 @@ end
 
 function displayHealers() 
 	--print healers in format spec class (playername)
-	
 	sortByFaction()
 
-	print("|cff00aeef Alliance healers".."("..tableLength(allianceHealers).."):")
+	print("|cff00aeef Alliance healers ("..tableLength(allianceHealers).."):")
 	for i, v in ipairs(allianceHealers) do
 		print(getClassColor(v[3])..v[4]..' '..v[3]..' ('..v[1]..')')
 	end
 	print("\n")
-	print("|cffff0000Horde healers".."("..tableLength(hordeHealers).."):")
+	print("|cffff0000Horde healers ("..tableLength(hordeHealers).."):")
 	for i, v in ipairs(hordeHealers) do
 		print(getClassColor(v[3])..v[4]..' '..v[3]..' ('..v[1]..')')
 	end
 end
-
-
 
