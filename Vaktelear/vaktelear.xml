@@ -1,0 +1,12 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Frame name="vaktelearCore">
+        <Scripts>
+            <OnLoad>
+                vaktelearRegisterEvents(self)
+            </OnLoad>
+            <OnEvent>
+                vaktelearEventHandler(self, event, ...)
+            </OnEvent>
+        </Scripts>
+    </Frame>
+</Ui>

@@ -1,0 +1,7 @@
+## Interface: 80000
+## Title: Vaktelear
+## Version: 1.0.0
+## Description: Auction house scanning and buying helper. 
+
+vaktelear.lua
+vaktelear.xml
